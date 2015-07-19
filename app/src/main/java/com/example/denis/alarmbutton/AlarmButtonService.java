@@ -1,6 +1,7 @@
 package com.example.denis.alarmbutton;
 
 
+import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -11,6 +12,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -25,7 +27,13 @@ import com.google.android.gms.location.LocationServices;
 import java.util.ArrayList;
 
 /**
- * AlarmButton created by Denis Pavlovsky on 29.04.15.
+ * AlarmButtonService created by Denis Pavlovsky on 29.04.15.
+ *
+ * This service include such functions as: gaining information about location of the user,
+ * reading the list of email adresses and phone numbers from the datadase,
+ * send emails to the email adresses from database, send SMS messages to the mobile numbers. Also
+ * check if "Alarm" of OFF or ON and depends of this - execute alarm() method again or not.
+ *
  */
 public class AlarmButtonService extends IntentService
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
@@ -35,11 +43,15 @@ public class AlarmButtonService extends IntentService
 
     private final static String SENT = "SMS_SENT";
 
+    private static boolean ManagerStart = false;
+
     private Location location;
     private ArrayList<String> numbers;
     private ArrayList<String> emails;
     private String message;
     private GoogleApiClient mGoogleApiClient;
+    private AlarmManager manager;
+    private PendingIntent pendingIntent;
 
     public AlarmButtonService(String name) {
         super(name);
@@ -47,15 +59,24 @@ public class AlarmButtonService extends IntentService
 
 
     @Override
+    public IBinder onBind(Intent intent) {
+        if (App.ALARM) {
+            alarm();
+        }
+
+        return null;
+    }
+
+    @Override
     protected void onHandleIntent(Intent intent) {
-        if (intent.getExtras().getBoolean("Alarm")) {
+        if (App.ALARM) {
             alarm();
         }
     }
 
     private void alarm() {
 
-        Log.w(TAG, "AlarmTask Method STARTS ");
+        Log.w(TAG, "alarm Method STARTS ");
         numbers = getNumbers();
 
         emails = getMails();
@@ -78,9 +99,23 @@ public class AlarmButtonService extends IntentService
             sendEmailWithLocation();
         }
 
-        Log.w(TAG, "AlarmTask Method ENDS ");
+
+        if (App.ALARM && ManagerStart && App.IS_ALARM_REPEATING) {
+            manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+            Intent newIntent = new Intent(getApplicationContext(), AlarmButtonService.class);
 
 
+            pendingIntent = PendingIntent.getService(getApplicationContext(), App.ALARM_REQUEST_CODE, newIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+            manager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, App.ALARM_INTERVAL, App.ALARM_INTERVAL, pendingIntent);
+
+            ManagerStart = true;
+        } else if (!App.ALARM && !ManagerStart) {
+            manager.cancel(pendingIntent);
+        }
+
+        Log.w(TAG, "alarm Method ENDS ");
 
     }
 
@@ -235,6 +270,7 @@ public class AlarmButtonService extends IntentService
 
         super.onDestroy();
     }
+
 
     /**
      * volume key tracking START

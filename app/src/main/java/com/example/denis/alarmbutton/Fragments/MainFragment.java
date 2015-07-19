@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.denis.alarmbutton.AlarmButtonService;
+import com.example.denis.alarmbutton.App;
 import com.example.denis.alarmbutton.R;
 
 /**
@@ -71,10 +72,13 @@ public class MainFragment extends Fragment implements View.OnClickListener {
             case R.id.alarm:
                 Log.w(TAG, "MainFragment alarm click");
 
+                App.ALARM = true;
+
                 Intent intent = new Intent(getActivity(), AlarmButtonService.class);
-                intent.putExtra("Alarm", true);
                 getActivity().bindService(intent, serviceConnection, Context.BIND_ABOVE_CLIENT);
+
                 Toast.makeText(getActivity(), R.string.MessageSentToast, Toast.LENGTH_LONG).show();
+
                 break;
             case R.id.settings:
                 Log.w(TAG, "MainFragment settings click");

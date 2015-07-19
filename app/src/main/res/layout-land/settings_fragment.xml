@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#5FF5F2">
+
+    <EditText
+        android:id="@+id/name"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:hint="@string/NameTextHing"
+        android:background="@drawable/settings_edit_text_shape"
+        android:textColorHint="#DEFF8A"
+        />
+
+    <Spinner
+        android:id="@+id/choose_mail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/name"
+        android:background="@drawable/settings_edit_text_shape"
+        android:textColorHint="#DEFF8A"
+        />
+
+    <EditText
+        android:id="@+id/mail"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_below="@+id/choose_mail"
+        android:hint="@string/MailTextHing"
+        android:background="@drawable/settings_edit_text_shape"
+        android:textColorHint="#DEFF8A"/>
+
+    <EditText
+        android:id="@+id/pass"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:inputType="textPassword"
+        android:hint="@string/PassTextHing"
+        android:layout_below="@+id/mail"
+        android:background="@drawable/settings_edit_text_shape"
+        android:textColorHint="#DEFF8A"/>
+
+
+    <TextView
+        android:id="@+id/emailArray"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/emailArrayTextview"
+        android:textSize="30sp"
+        android:layout_below="@+id/pass"
+        android:background="@drawable/settings_edit_text_shape"
+        />
+
+    <Button
+        android:id="@+id/addMailButton"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/pass"
+        android:background="@drawable/add_button_shape"/>
+
+
+    <TextView
+        android:id="@+id/numbersArray"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/numbersArrayTextview"
+        android:textSize="30sp"
+        android:layout_below="@+id/emailArray"
+        android:background="@drawable/settings_edit_text_shape"
+        />
+
+    <Button
+        android:id="@+id/addNumberButton"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/emailArray"
+        android:background="@drawable/add_button_shape"/>
+
+
+    <Button
+        android:id="@+id/SaveButton"
+        android:layout_width="200dp"
+        android:layout_height="70dp"
+        android:text="@string/SaveButton"
+        android:layout_below="@+id/addNumberButton"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/settings_button_shape"/>
+
+
+</RelativeLayout>

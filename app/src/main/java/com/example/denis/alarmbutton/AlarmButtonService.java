@@ -1,8 +1,8 @@
 package com.example.denis.alarmbutton;
 
 
+import android.app.IntentService;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -10,9 +10,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -29,7 +27,7 @@ import java.util.ArrayList;
 /**
  * AlarmButton created by Denis Pavlovsky on 29.04.15.
  */
-public class AlarmButtonService extends Service
+public class AlarmButtonService extends IntentService
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         KeyEvent.Callback {
 
@@ -43,24 +41,46 @@ public class AlarmButtonService extends Service
     private String message;
     private GoogleApiClient mGoogleApiClient;
 
+    public AlarmButtonService(String name) {
+        super(name);
+    }
+
+
     @Override
-    public IBinder onBind(Intent intent) {
+    protected void onHandleIntent(Intent intent) {
         if (intent.getExtras().getBoolean("Alarm")) {
             alarm();
         }
-        return null;
     }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        return super.onStartCommand(intent, flags, startId);
-    }
-
 
     private void alarm() {
 
-        AlarmTask alarmTask = new AlarmTask();
-        alarmTask.execute();
+        Log.w(TAG, "AlarmTask Method STARTS ");
+        numbers = getNumbers();
+
+        emails = getMails();
+
+        getLocation();
+
+        if (location != null) {
+            Log.w(TAG, "location != null");
+            message = getString(R.string.SaveMe) + String.valueOf(location.getLatitude()) + getString(R.string.Langtitude)
+                    + String.valueOf(location.getLongitude()) + getString(R.string.Logntitude);
+        } else {
+            message = "Save me please! ";
+        }
+
+
+        if (!numbers.isEmpty()) {
+            sendSmsWithLocation();
+        }
+        if (!emails.isEmpty()) {
+            sendEmailWithLocation();
+        }
+
+        Log.w(TAG, "AlarmTask Method ENDS ");
+
+
 
     }
 
@@ -264,39 +284,5 @@ public class AlarmButtonService extends Service
     /**
      * volume key tracking END
      */
-
-    class AlarmTask extends AsyncTask <String, String, String>{
-
-            @Override
-            protected String doInBackground(String... params) {
-
-                Log.w(TAG, "AlarmTask Method STARTS ");
-                numbers = getNumbers();
-
-                emails = getMails();
-
-                getLocation();
-
-                if (location != null) {
-                    Log.w(TAG, "location != null");
-                    message = getString(R.string.SaveMe) + String.valueOf(location.getLatitude()) + getString(R.string.Langtitude)
-                            + String.valueOf(location.getLongitude()) + getString(R.string.Logntitude);
-                } else {
-                    message = "Save me please! ";
-                }
-
-
-                if (!numbers.isEmpty()) {
-                    sendSmsWithLocation();
-                }
-                if (!emails.isEmpty()) {
-                    sendEmailWithLocation();
-                }
-
-                Log.w(TAG, "AlarmTask Method ENDS ");
-
-                return null;
-            }
-        }
 
 }

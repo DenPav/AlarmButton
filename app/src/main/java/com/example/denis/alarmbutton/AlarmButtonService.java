@@ -53,8 +53,8 @@ public class AlarmButtonService extends IntentService
     private AlarmManager manager;
     private PendingIntent pendingIntent;
 
-    public AlarmButtonService(String name) {
-        super(name);
+    public AlarmButtonService() {
+        super("AlarmButtonService");
     }
 
 

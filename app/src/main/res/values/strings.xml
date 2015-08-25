@@ -16,4 +16,5 @@
     <string name="emailArrayTextview">eMails list</string>
     <string name="add">Add</string>
     <string name="cancel">cancel</string>
+    <string name="textview_add_number_dialog">Enter the telephone number you want to add. For example "+38 048 111 11 11" (without backspaces)</string>
 </resources>

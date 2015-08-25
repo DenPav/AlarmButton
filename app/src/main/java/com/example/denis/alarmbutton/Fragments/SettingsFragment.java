@@ -26,6 +26,9 @@ import com.example.denis.alarmbutton.DBclasses.EmailTable;
 import com.example.denis.alarmbutton.DBclasses.NumberTable;
 import com.example.denis.alarmbutton.R;
 
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+
 
 /**
  * AlarmButton created by Denis Pavlovsky on 07.05.15.
@@ -46,7 +49,6 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
         super.onCreate(savedInstanceState);
 
         sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-        editor = sharedPref.edit();
     }
 
     @Nullable
@@ -85,10 +87,20 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
     public void onClick(View v) {
         Log.w(TAG, "Save button click ");
 
-        editor.putString(App.USER_NAME, nameText.getText().toString());
-        editor.putString(App.USER_EMAIL, mailText.getText().toString());
-        editor.putString(App.USER_PASS, pass.getText().toString());
-        editor.apply();
+        switch ( v.getId()) {
+            case R.id.SaveButton:
+                editor.putString(App.USER_NAME, nameText.getText().toString());
+                editor.putString(App.USER_EMAIL, mailText.getText().toString());
+                editor.putString(App.USER_PASS, pass.getText().toString());
+                editor.apply();
+                break;
+            case R.id.addMailButton:
+                    addMailButton();
+                break;
+            case R.id.addNumberButton:
+                addNumberButton();
+                break;
+        }
     }
 
     @Override
@@ -100,7 +112,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         Log.w(TAG, "Spinner click ");
-
+        editor = sharedPref.edit();
         if (editor != null) {
             switch (position) {
                 case 1:
@@ -132,8 +144,6 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
                     editor.apply();
                     break;
             }
-        } else {
-
         }
 
         if (position > 0 && position < 8) {
@@ -155,23 +165,53 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        builder.setView(inflater.inflate(R.layout.dialog_mail_add, null))
-
+        final View dialogView = inflater.inflate(R.layout.dialog_mail_add, null);
+        builder.setView(dialogView)
                 .setPositiveButton(R.string.add, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
+                        EditText editText = (EditText) dialogView.findViewById(R.id.username);
+                        String text = editText.getText().toString();
 
+                        try {
+                            InternetAddress mail = new InternetAddress(text);
+                            mail.validate();
+                            addMailToTable(text);
+                        } catch (AddressException e) {
+                            e.printStackTrace();
+                            Toast.makeText(getActivity(), "Sorry your email address is wrong! Try again!", Toast.LENGTH_LONG).show();
+                        }
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
 
                     }
-                }).create();
+                }).create().show();
+
     }
 
     private void addNumberButton (){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.dialog_number_add, null);
+        builder.setView(dialogView)
+                .setPositiveButton(R.string.add, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        EditText editText = (EditText) dialogView.findViewById(R.id.username);
+
+                        // add phone number validation here !!!
+
+                        addNumberToTable(editText.getText().toString());
+                    }
+                })
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                    }
+                }).create().show();
     }
 
     /**

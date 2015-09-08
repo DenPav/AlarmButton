@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -18,6 +19,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.denis.alarmbutton.App;
@@ -25,6 +27,8 @@ import com.example.denis.alarmbutton.DBclasses.DBHelper;
 import com.example.denis.alarmbutton.DBclasses.EmailTable;
 import com.example.denis.alarmbutton.DBclasses.NumberTable;
 import com.example.denis.alarmbutton.R;
+
+import java.util.ArrayList;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -66,17 +70,28 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
         button.setOnClickListener(this);
 
         final Spinner spinner = (Spinner) view.findViewById(R.id.choose_mail);
-
         spinner.setSelection(0);
 
         ArrayAdapter<String> adapter = new
                 ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, mails);
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
         spinner.setAdapter(adapter);
-
         spinner.setOnItemSelectedListener(this);
+
+        TextView mailsArray = (TextView) view.findViewById(R.id.emailArray);
+        String finalMails = "";
+        for (String i : getMails()) {
+            finalMails += i + "; ";
+        }
+        mailsArray.setText(finalMails);
+
+        TextView numberArray = (TextView) view.findViewById(R.id.numbersArray);
+        String finalNumbers = "";
+        for (String i : getNumbers()) {
+            finalNumbers += i + "; ";
+        }
+        mailsArray.setText(finalMails);
 
         Log.w(TAG, "onCreateView ENDS ");
 
@@ -156,7 +171,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
-
+        Toast.makeText(getActivity(), "Will be used default email address - " + App.DEFOULT_MAIL, Toast.LENGTH_LONG).show();
     }
 
 
@@ -249,6 +264,59 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
             Toast.makeText(getActivity(), value + " added",
                     Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public ArrayList<String> getNumbers() {
+        Log.w(TAG, "getNumbers Method Start ");
+        ArrayList<String> numbersArray = new ArrayList<>();
+        final Cursor cursor = DBHelper.getInstance().getDatabase()
+                .query(NumberTable.TABLE_NAME, // table name
+                        null, // columns
+                        null, // selection
+                        null, // selectionArgs
+                        null, // groupBy
+                        null, // having
+                        null);// orderBy
+
+        final int textIndex = cursor.getColumnIndex(NumberTable.COLUMN_NUMBER);
+
+        while (cursor.moveToNext()) {
+            final String value = cursor.getString(textIndex);
+
+            numbersArray.add(value);
+        }
+        cursor.close();
+
+        Log.w(TAG, "getNumbers Method END ");
+        return numbersArray;
+    }
+
+
+    public ArrayList<String> getMails() {
+
+        Log.w(TAG, "getMails Method Start ");
+
+        ArrayList<String> mailsArray = new ArrayList<>();
+        final Cursor cursor = DBHelper.getInstance().getDatabase()
+                .query(EmailTable.TABLE_NAME, // table name
+                        null, // columns
+                        null, // selection
+                        null, // selectionArgs
+                        null, // groupBy
+                        null, // having
+                        null);// orderBy
+
+        final int textIndex = cursor.getColumnIndex(EmailTable.COLUMN_TEXT);
+
+        while (cursor.moveToNext()) {
+            final String value = cursor.getString(textIndex);
+
+            mailsArray.add(value);
+        }
+        cursor.close();
+
+        Log.w(TAG, "getMails Method End ");
+        return mailsArray;
     }
 
     /**

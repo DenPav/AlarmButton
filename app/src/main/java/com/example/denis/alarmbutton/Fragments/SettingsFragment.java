@@ -91,7 +91,14 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
         for (String i : getNumbers()) {
             finalNumbers += i + "; ";
         }
-        mailsArray.setText(finalMails);
+        mailsArray.setText(finalNumbers);
+
+        Button addMailButton = (Button) view.findViewById(R.id.addMailButton);
+        addMailButton.setOnClickListener(this);
+
+        Button addNumberButton = (Button) view.findViewById(R.id.addNumberButton);
+        addNumberButton.setOnClickListener(this);
+
 
         Log.w(TAG, "onCreateView ENDS ");
 
@@ -100,19 +107,20 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
 
     @Override
     public void onClick(View v) {
-        Log.w(TAG, "Save button click ");
-
         switch ( v.getId()) {
             case R.id.SaveButton:
+                Log.w(TAG, "Save button click ");
                 editor.putString(App.USER_NAME, nameText.getText().toString());
                 editor.putString(App.USER_EMAIL, mailText.getText().toString());
                 editor.putString(App.USER_PASS, pass.getText().toString());
                 editor.apply();
                 break;
             case R.id.addMailButton:
+                Log.w(TAG, "addMailButton click ");
                     addMailButton();
                 break;
             case R.id.addNumberButton:
+                Log.w(TAG, "addNumberButton click ");
                 addNumberButton();
                 break;
         }

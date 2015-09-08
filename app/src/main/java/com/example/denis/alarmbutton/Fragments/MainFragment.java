@@ -86,6 +86,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
                 SettingsFragment settingsFragment = new SettingsFragment();
                 FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.frameLayout, settingsFragment);
+                fragmentTransaction.addToBackStack("");
                 fragmentTransaction.commit();
                 break;
         }

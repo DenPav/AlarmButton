@@ -43,8 +43,6 @@ public class AlarmButtonService extends IntentService
 
     private final static String SENT = "SMS_SENT";
 
-    private static boolean ManagerStart = false;
-
     private Location location;
     private ArrayList<String> numbers;
     private ArrayList<String> emails;
@@ -74,6 +72,10 @@ public class AlarmButtonService extends IntentService
         }
     }
 
+    /**
+     * Main alarm method which calls all other methods.
+     */
+
     private void alarm() {
 
         Log.w(TAG, "alarm Method STARTS ");
@@ -99,19 +101,16 @@ public class AlarmButtonService extends IntentService
             sendEmailWithLocation();
         }
 
-
-        if (App.ALARM && ManagerStart && App.IS_ALARM_REPEATING) {
+        if (App.ALARM && App.IS_ALARM_REPEATING) {
             manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
             Intent newIntent = new Intent(getApplicationContext(), AlarmButtonService.class);
 
-
             pendingIntent = PendingIntent.getService(getApplicationContext(), App.ALARM_REQUEST_CODE, newIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-            manager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, App.ALARM_INTERVAL, App.ALARM_INTERVAL, pendingIntent);
+            manager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, App.ALARM_INTERVAL * 60 * 1000, App.ALARM_INTERVAL, pendingIntent);
 
-            ManagerStart = true;
-        } else if (!App.ALARM && !ManagerStart) {
+        } else if (!App.ALARM) {
             manager.cancel(pendingIntent);
         }
 
@@ -295,12 +294,12 @@ public class AlarmButtonService extends IntentService
         switch (keyCode) {
             case KeyEvent.KEYCODE_VOLUME_UP:
                 Log.w(TAG, "KEYCODE_VOLUME_UP ");
-
+                App.ALARM = true;
                 alarm();
                 return true;
             case KeyEvent.KEYCODE_VOLUME_DOWN:
                 Log.w(TAG, "KEYCODE_VOLUME_UP ");
-
+                App.ALARM = true;
                 alarm();
                 return true;
         }

@@ -11,8 +11,20 @@
         android:text="@string/AlarmButtonText"
         android:layout_width="200dp"
         android:layout_height="200dp"
-        android:layout_centerInParent="true"
+        android:layout_marginTop="150dp"
+        android:layout_centerHorizontal="true"
         android:background="@drawable/button_corners_shape"/>
+
+    <Switch
+        android:id="@+id/AlarmSwitch"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/alarm"
+        android:switchMinWidth="100sp"
+        android:textSize="30sp"
+        android:layout_marginTop="50dp"
+        android:text="Alarm: " />
 
     <Button
         android:id="@+id/settings"

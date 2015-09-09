@@ -19,9 +19,25 @@ public class App extends Application {
     public static final String DEFOULT_PASS = "sdjkfneufhwu";
     public static final String SMTP_NAME = "SMTP_NAME";
 
+
+    /**
+     * Boolean variable which indicates if alarm state is ON or OFF.
+     * Depend on this state AlarmButtonService will start or not.
+     */
     public static boolean ALARM = false;
+    /**
+     * Request code for the Alarm Pending Intent
+     */
     public static final int ALARM_REQUEST_CODE = 1111;
+
+    /**
+     * Interval of alarm Service launch in minutes.
+     */
     public static long ALARM_INTERVAL = 900000;
+
+    /**
+     * Boolean variable which indicates if Alarm Service will be launch repeatedly.
+     */
     public static boolean IS_ALARM_REPEATING = true;
 
     @Override

@@ -1,7 +1,9 @@
 package com.example.denis.alarmbutton.Fragments;
 
+import android.app.AlarmManager;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +16,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.example.denis.alarmbutton.AlarmButtonService;
@@ -53,6 +57,36 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         button = (Button) view.findViewById(R.id.alarm);
         settingsButton = (Button) view.findViewById(R.id.settings);
 
+        Switch aSwitch = (Switch) view.findViewById(R.id.AlarmSwitch);
+        if(App.ALARM){
+            aSwitch.setChecked(true);
+        }else {
+            aSwitch.setChecked(false);
+        }
+        aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                if(isChecked){
+                    App.ALARM = true;
+                    startAlarm();
+                }else{
+                    if (App.ALARM && App.IS_ALARM_REPEATING) {
+                        AlarmManager manager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+
+                        Intent newIntent = new Intent(getActivity(), AlarmButtonService.class);
+
+                        PendingIntent pendingIntent = PendingIntent.getService(getActivity(), App.ALARM_REQUEST_CODE, newIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+                        manager.cancel(pendingIntent);
+                    }
+                App.ALARM = false;
+            }
+        }
+        });
+
+
         return view;
 
     }
@@ -74,10 +108,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
                 App.ALARM = true;
 
-                Intent intent = new Intent(getActivity(), AlarmButtonService.class);
-                getActivity().bindService(intent, serviceConnection, Context.BIND_ABOVE_CLIENT);
-
-                Toast.makeText(getActivity(), R.string.MessageSentToast, Toast.LENGTH_LONG).show();
+                startAlarm();
 
                 break;
             case R.id.settings:
@@ -90,5 +121,17 @@ public class MainFragment extends Fragment implements View.OnClickListener {
                 fragmentTransaction.commit();
                 break;
         }
+    }
+
+    private void startAlarm (){
+
+        if (App.ALARM){
+            Intent intent = new Intent(getActivity(), AlarmButtonService.class);
+            getActivity().bindService(intent, serviceConnection, Context.BIND_ABOVE_CLIENT);
+
+            Toast.makeText(getActivity(), R.string.MessageSentToast, Toast.LENGTH_LONG).show();
+        }
+
+
     }
 }

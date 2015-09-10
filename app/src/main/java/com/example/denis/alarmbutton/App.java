@@ -15,12 +15,12 @@ public class App extends Application {
     public final static String USER_NAME = "NAME";
     public static final String USER_EMAIL = "USER_EMAIL";
     public static final String USER_PASS = "USER_PASS";
-    public static final String DEFOULT_MAIL = "savemebutton@gmail.com";
+    public static final String DEFAULT_MAIL = "savemebutton@gmail.com";
     public static final String DEFOULT_PASS = "sdjkfneufhwu";
     public static final String SMTP_NAME = "SMTP_NAME";
 
 
-    public static final boolean DEFAULT_MAIL = true;
+    public static boolean USE_DEFAULT_MAIL = true;
 
 
     /**

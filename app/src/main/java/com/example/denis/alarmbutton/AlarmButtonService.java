@@ -214,14 +214,25 @@ public class AlarmButtonService extends IntentService
                 getSharedPreferences(App.PREFERENCES_NAME, Context.MODE_PRIVATE);
 
         try {
-            MailSender sender = new MailSender(getApplicationContext(), sharedPref.getString(App.USER_EMAIL, App.DEFOULT_MAIL),
-                    sharedPref.getString(App.USER_PASS, App.DEFOULT_PASS));
-            for (int i = 0; i < emails.size(); i++) {
-                sender.sendMail(App.MAIL_SUBJECT + sharedPref.getString(App.USER_NAME, "<<Name>>"),
-                        message,
-                        sharedPref.getString(App.USER_EMAIL, App.DEFOULT_MAIL),
-                        emails.get(i));
+            if (App.USE_DEFAULT_MAIL) {
+                MailSender sender = new MailSender(getApplicationContext(), App.DEFAULT_MAIL, App.DEFOULT_PASS);
+                for (int i = 0; i < emails.size(); i++) {
+                    sender.sendMail(App.MAIL_SUBJECT + sharedPref.getString(App.USER_NAME, "<<Name>>"),
+                            message,
+                            App.DEFAULT_MAIL,
+                            emails.get(i));
+                }
+            } else {
+                MailSender sender = new MailSender(getApplicationContext(), sharedPref.getString(App.USER_EMAIL, App.DEFAULT_MAIL),
+                        sharedPref.getString(App.USER_PASS, App.DEFOULT_PASS));
+                for (int i = 0; i < emails.size(); i++) {
+                    sender.sendMail(App.MAIL_SUBJECT + sharedPref.getString(App.USER_NAME, "<<Name>>"),
+                            message,
+                            sharedPref.getString(App.USER_EMAIL, App.DEFAULT_MAIL),
+                            emails.get(i));
+                }
             }
+
         } catch (Exception e) {
             Log.e("SendMail", e.getMessage(), e);
         }

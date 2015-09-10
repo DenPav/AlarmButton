@@ -54,7 +54,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
     private TextView numberArray;
 
     private String smtpName;
-    private boolean isOwnMailChecked = false;
+    public static boolean isOwnMailChecked = false;
     private boolean spinnerMailChosen = false;
 
     private View v;
@@ -190,7 +190,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
                 Log.w(TAG, "Save button click ");
                 String mailAdress = mailText.getText().toString();
                 String userPass = pass.getText().toString();
-                if (isOwnMailChecked && smtpName != null && userPass != "") {
+                if (isOwnMailChecked && smtpName != null && userPass != "" && spinnerMailChosen) {
                     try {
                         InternetAddress mail = new InternetAddress(mailAdress);
                         mail.validate();
@@ -200,11 +200,14 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
                         editor.putString(App.USER_EMAIL, mailAdress);
                         editor.putString(App.USER_PASS, userPass);
                         editor.apply();
+                        App.USE_DEFAULT_MAIL = false;
                         Toast.makeText(getActivity(), "Your email address is accepted. But we don`t recommend you to use it ! ", Toast.LENGTH_LONG).show();
                     } catch (AddressException e) {
                         e.printStackTrace();
                         Toast.makeText(getActivity(), "Sorry your email address is wrong! Try again!", Toast.LENGTH_LONG).show();
                     }
+                } else {
+                    Toast.makeText(getActivity(), "Attention! You have entered incorrect data! ", Toast.LENGTH_LONG).show();
                 }
 
 
@@ -236,27 +239,27 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
                     break;
                 case 2:
                     smtpName = mails[2];
-
+                    spinnerMailChosen = true;
                     break;
                 case 3:
                     smtpName = mails[3];
-
+                    spinnerMailChosen = true;
                     break;
                 case 4:
                     smtpName = mails[4];
-
+                    spinnerMailChosen = true;
                     break;
                 case 5:
                     smtpName = mails[5];
-
+                    spinnerMailChosen = true;
                     break;
                 case 6:
                     smtpName = mails[6];
-
+                    spinnerMailChosen = true;
                     break;
                 case 7:
                     smtpName = mails[7];
-
+                    spinnerMailChosen = true;
                     break;
             }
 
@@ -265,7 +268,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
-        Toast.makeText(getActivity(), "Will be used default email address - " + App.DEFOULT_MAIL, Toast.LENGTH_LONG).show();
+        Toast.makeText(getActivity(), "Will be used default email address - " + App.DEFAULT_MAIL, Toast.LENGTH_LONG).show();
     }
 
 

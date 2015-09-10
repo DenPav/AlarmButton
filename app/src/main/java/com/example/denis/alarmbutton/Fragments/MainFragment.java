@@ -41,6 +41,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     };
     private Button button;
     private Button settingsButton;
+    private Switch aSwitch;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -57,7 +58,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         button = (Button) view.findViewById(R.id.alarm);
         settingsButton = (Button) view.findViewById(R.id.settings);
 
-        Switch aSwitch = (Switch) view.findViewById(R.id.AlarmSwitch);
+        aSwitch = (Switch) view.findViewById(R.id.AlarmSwitch);
         if(App.ALARM){
             aSwitch.setChecked(true);
         }else {
@@ -68,10 +69,10 @@ public class MainFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
-                if(isChecked){
+                if (isChecked) {
                     App.ALARM = true;
                     startAlarm();
-                }else{
+                } else {
                     if (App.ALARM && App.IS_ALARM_REPEATING) {
                         AlarmManager manager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
 
@@ -81,9 +82,9 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
                         manager.cancel(pendingIntent);
                     }
-                App.ALARM = false;
+                    App.ALARM = false;
+                }
             }
-        }
         });
 
 
@@ -107,7 +108,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
                 Log.w(TAG, "MainFragment alarm click");
 
                 App.ALARM = true;
-
+                aSwitch.setChecked(true);
                 startAlarm();
 
                 break;

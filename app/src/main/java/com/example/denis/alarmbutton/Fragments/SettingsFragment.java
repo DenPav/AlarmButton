@@ -9,7 +9,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
-import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +16,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,10 +45,20 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
 
     private static String [] mails = {"Choose mail..", "gmail.com", "yandex.ru", "yahoo.com", "mail.com", "mail.ru", "ukr.net"};
     private SharedPreferences sharedPref;
-    private SharedPreferences.Editor editor;
+    private SharedPreferences.Editor editor = sharedPref.edit();
     private EditText nameText;
     private EditText mailText;
     private EditText pass;
+
+    private TextView mailsArray;
+    private TextView numberArray;
+
+    private String smtpName;
+    private boolean isOwnMailChecked = false;
+    private boolean spinnerMailChosen = false;
+
+    private View v;
+    private Spinner spinner;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,17 +71,19 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.settings_fragment, container, false);
-
+        v = view;
         Log.w(TAG, "onCreateView Start ");
 
         nameText = (EditText) view.findViewById(R.id.name);
         mailText = (EditText) view.findViewById(R.id.mail);
         pass = (EditText) view.findViewById(R.id.pass);
+        mailText.setEnabled(false);
+        pass.setEnabled(false);
 
         Button button = (Button) view.findViewById(R.id.SaveButton);
         button.setOnClickListener(this);
 
-        final Spinner spinner = (Spinner) view.findViewById(R.id.choose_mail);
+        spinner = (Spinner) view.findViewById(R.id.choose_mail);
         spinner.setSelection(0);
 
         ArrayAdapter<String> adapter = new
@@ -78,20 +92,64 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
+        spinner.setEnabled(false);
 
-        TextView mailsArray = (TextView) view.findViewById(R.id.emailArray);
-        String finalMails = "";
-        for (String i : getMails()) {
-            finalMails += i + "; ";
-        }
-        mailsArray.setText(finalMails);
+        CheckBox ownMailCheckBox = (CheckBox) view.findViewById(R.id.OwnMailCheck);
+        ownMailCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                // TODO Auto-generated method stub
+                if (buttonView.isChecked()) {
+                    mailText.setEnabled(true);
+                    pass.setEnabled(true);
+                    spinner.setEnabled(true);
+                    isOwnMailChecked = true;
+                } else {
+                    mailText.setEnabled(false);
+                    pass.setEnabled(false);
+                    spinner.setEnabled(false);
+                }
 
-        TextView numberArray = (TextView) view.findViewById(R.id.numbersArray);
-        String finalNumbers = "";
-        for (String i : getNumbers()) {
-            finalNumbers += i + "; ";
-        }
-        mailsArray.setText(finalNumbers);
+            }
+        });
+
+        final SeekBar repeatSeekBar = (SeekBar) view.findViewById(R.id.repeatSeekBar);
+        repeatSeekBar.setEnabled(false);
+        repeatSeekBar.setProgress(App.ALARM_INTERVAL);
+        repeatSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                App.ALARM_INTERVAL = progress;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        CheckBox repeatCheckBox = (CheckBox) view.findViewById(R.id.repeatCheckBox);
+        repeatCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                // TODO Auto-generated method stub
+                if (buttonView.isChecked()) {
+                    repeatSeekBar.setEnabled(true);
+                }
+                else {
+                    repeatSeekBar.setEnabled(false);
+                }
+
+            }
+        });
+
+
+        refreshText();
 
         Button addMailButton = (Button) view.findViewById(R.id.addMailButton);
         addMailButton.setOnClickListener(this);
@@ -105,15 +163,51 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
         return view;
     }
 
+    public void refreshText (){
+        if (mailsArray == null){
+            mailsArray = (TextView) v.findViewById(R.id.emailArray);
+        }
+        String finalMails = "";
+        for (String i : getMails()) {
+            finalMails += i + "\n ";
+        }
+        mailsArray.setText(finalMails);
+
+        if (numberArray == null){
+            numberArray = (TextView) v.findViewById(R.id.numbersArray);
+        }
+        String finalNumbers = "";
+        for (String i : getNumbers()) {
+            finalNumbers += i + "\n ";
+        }
+        numberArray.setText(finalNumbers);
+    }
+
     @Override
     public void onClick(View v) {
         switch ( v.getId()) {
             case R.id.SaveButton:
                 Log.w(TAG, "Save button click ");
-                editor.putString(App.USER_NAME, nameText.getText().toString());
-                editor.putString(App.USER_EMAIL, mailText.getText().toString());
-                editor.putString(App.USER_PASS, pass.getText().toString());
-                editor.apply();
+                String mailAdress = mailText.getText().toString();
+                String userPass = pass.getText().toString();
+                if (isOwnMailChecked && smtpName != null && userPass != "") {
+                    try {
+                        InternetAddress mail = new InternetAddress(mailAdress);
+                        mail.validate();
+
+                        editor.putString(App.USER_NAME, nameText.getText().toString());
+                        editor.putString(App.SMTP_NAME, smtpName);
+                        editor.putString(App.USER_EMAIL, mailAdress);
+                        editor.putString(App.USER_PASS, userPass);
+                        editor.apply();
+                        Toast.makeText(getActivity(), "Your email address is accepted. But we don`t recommend you to use it ! ", Toast.LENGTH_LONG).show();
+                    } catch (AddressException e) {
+                        e.printStackTrace();
+                        Toast.makeText(getActivity(), "Sorry your email address is wrong! Try again!", Toast.LENGTH_LONG).show();
+                    }
+                }
+
+
                 break;
             case R.id.addMailButton:
                 Log.w(TAG, "addMailButton click ");
@@ -135,45 +229,37 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         Log.w(TAG, "Spinner click ");
-        editor = sharedPref.edit();
-        if (editor != null) {
             switch (position) {
                 case 1:
-                    editor.putString(App.SMTP_NAME, mails[1]);
-                    editor.apply();
+                    smtpName = mails[1];
+
                     break;
                 case 2:
-                    editor.putString(App.SMTP_NAME, mails[2]);
-                    editor.apply();
+                    smtpName = mails[2];
+
                     break;
                 case 3:
-                    editor.putString(App.SMTP_NAME, mails[3]);
-                    editor.apply();
+                    smtpName = mails[3];
+
                     break;
                 case 4:
-                    editor.putString(App.SMTP_NAME, mails[4]);
-                    editor.apply();
+                    smtpName = mails[4];
+
                     break;
                 case 5:
-                    editor.putString(App.SMTP_NAME, mails[5]);
-                    editor.apply();
+                    smtpName = mails[5];
+
                     break;
                 case 6:
-                    editor.putString(App.SMTP_NAME, mails[6]);
-                    editor.apply();
+                    smtpName = mails[6];
+
                     break;
                 case 7:
-                    editor.putString(App.SMTP_NAME, mails[7]);
-                    editor.apply();
+                    smtpName = mails[7];
+
                     break;
             }
-        }
 
-        if (position > 0 && position < 8) {
-            mailText.setEnabled(true);
-            mailText.setInputType(InputType.TYPE_CLASS_TEXT);
-            mailText.setFocusable(true);
-        }
     }
 
 
@@ -200,9 +286,10 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
                             InternetAddress mail = new InternetAddress(text);
                             mail.validate();
                             addMailToTable(text);
+                            refreshText();
                         } catch (AddressException e) {
                             e.printStackTrace();
-                            Toast.makeText(getActivity(), "Sorry your email address is wrong! Try again!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getActivity(), "Sorry email address is wrong! Try again!", Toast.LENGTH_LONG).show();
                         }
                     }
                 })
@@ -228,6 +315,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
                         // add phone number validation here !!!
 
                         addNumberToTable(editText.getText().toString());
+                        refreshText();
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {

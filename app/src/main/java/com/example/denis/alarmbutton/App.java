@@ -20,6 +20,9 @@ public class App extends Application {
     public static final String SMTP_NAME = "SMTP_NAME";
 
 
+    public static final boolean DEFAULT_MAIL = true;
+
+
     /**
      * Boolean variable which indicates if alarm state is ON or OFF.
      * Depend on this state AlarmButtonService will start or not.
@@ -33,7 +36,7 @@ public class App extends Application {
     /**
      * Interval of alarm Service launch in minutes.
      */
-    public static long ALARM_INTERVAL = 900000;
+    public static int ALARM_INTERVAL = 5;
 
     /**
      * Boolean variable which indicates if Alarm Service will be launch repeatedly.

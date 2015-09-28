@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
-    android:background="#5FF5F2">
+    >
 
     <Button
         android:id="@+id/alarm"
@@ -13,7 +13,11 @@
         android:layout_height="200dp"
         android:layout_marginTop="150dp"
         android:layout_centerHorizontal="true"
-        android:background="@drawable/button_corners_shape"/>
+
+        />
+        <!--android:background="@drawable/button_corners_shape"/>-->
+
+
 
     <Switch
         android:id="@+id/AlarmSwitch"
@@ -22,9 +26,9 @@
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/alarm"
         android:switchMinWidth="100sp"
-        android:textSize="30sp"
+        android:textSize="25sp"
         android:layout_marginTop="50dp"
-        android:text="Alarm: " />
+        android:text="Alarm:" />
 
     <Button
         android:id="@+id/settings"
@@ -33,5 +37,5 @@
         android:text="@string/SettingsButtonText"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:background="@drawable/settings_button_shape"/>
+        />
 </RelativeLayout>

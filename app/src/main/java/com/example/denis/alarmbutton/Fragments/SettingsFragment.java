@@ -44,8 +44,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
     private static final String TAG = SettingsFragment.class.getSimpleName();
 
     private static String [] mails = {"Choose mail..", "gmail.com", "yandex.ru", "yahoo.com", "mail.com", "mail.ru", "ukr.net"};
-    private SharedPreferences sharedPref;
-    private SharedPreferences.Editor editor = sharedPref.edit();
+    private SharedPreferences.Editor editor;
     private EditText nameText;
     private EditText mailText;
     private EditText pass;
@@ -64,7 +63,8 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        editor = sharedPref.edit();
     }
 
     @Nullable
@@ -115,7 +115,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
 
         final SeekBar repeatSeekBar = (SeekBar) view.findViewById(R.id.repeatSeekBar);
         repeatSeekBar.setEnabled(false);
-        repeatSeekBar.setProgress(App.ALARM_INTERVAL);
+        repeatSeekBar.setProgress((int)App.ALARM_INTERVAL);
         repeatSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -190,26 +190,29 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
                 Log.w(TAG, "Save button click ");
                 String mailAdress = mailText.getText().toString();
                 String userPass = pass.getText().toString();
-                if (isOwnMailChecked && smtpName != null && userPass != "" && spinnerMailChosen) {
-                    try {
+                if (isOwnMailChecked){
+                    if (smtpName != null && spinnerMailChosen) {
+                        try {
                         InternetAddress mail = new InternetAddress(mailAdress);
                         mail.validate();
 
-                        editor.putString(App.USER_NAME, nameText.getText().toString());
                         editor.putString(App.SMTP_NAME, smtpName);
                         editor.putString(App.USER_EMAIL, mailAdress);
                         editor.putString(App.USER_PASS, userPass);
                         editor.apply();
                         App.USE_DEFAULT_MAIL = false;
                         Toast.makeText(getActivity(), "Your email address is accepted. But we don`t recommend you to use it ! ", Toast.LENGTH_LONG).show();
-                    } catch (AddressException e) {
+                        } catch (AddressException e) {
                         e.printStackTrace();
                         Toast.makeText(getActivity(), "Sorry your email address is wrong! Try again!", Toast.LENGTH_LONG).show();
-                    }
-                } else {
+                     }
+                    }else {
+
                     Toast.makeText(getActivity(), "Attention! You have entered incorrect data! ", Toast.LENGTH_LONG).show();
+                    }
                 }
 
+                editor.putString(App.USER_NAME, nameText.getText().toString());
 
                 break;
             case R.id.addMailButton:

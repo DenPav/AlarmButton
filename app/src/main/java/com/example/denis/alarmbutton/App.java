@@ -17,6 +17,7 @@ public class App extends Application {
     public static final String USER_PASS = "USER_PASS";
     public static final String DEFAULT_MAIL = "savemebutton@gmail.com";
     public static final String DEFOULT_PASS = "sdjkfneufhwu";
+    public static final String DEFOULT_SMTP = "gmail.com";
     public static final String SMTP_NAME = "SMTP_NAME";
 
 
@@ -36,12 +37,12 @@ public class App extends Application {
     /**
      * Interval of alarm Service launch in minutes.
      */
-    public static int ALARM_INTERVAL = 5;
+    public static long ALARM_INTERVAL = 5;
 
     /**
      * Boolean variable which indicates if Alarm Service will be launch repeatedly.
      */
-    public static boolean IS_ALARM_REPEATING = true;
+    public static boolean IS_ALARM_REPEATING = false;
 
     @Override
     public void onCreate() {

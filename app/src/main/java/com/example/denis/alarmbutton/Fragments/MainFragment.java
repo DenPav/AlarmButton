@@ -4,12 +4,9 @@ import android.app.AlarmManager;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.app.PendingIntent;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,14 +28,6 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
     private static final String TAG = MainFragment.class.getSimpleName();
 
-    private ServiceConnection serviceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-        }
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-        }
-    };
     private Button button;
     private Button settingsButton;
     private Switch aSwitch;
@@ -46,8 +35,6 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
     }
 
     @Nullable
@@ -109,8 +96,6 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
                 App.ALARM = true;
                 aSwitch.setChecked(true);
-                startAlarm();
-
                 break;
             case R.id.settings:
                 Log.w(TAG, "MainFragment settings click");
@@ -125,14 +110,10 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     }
 
     private void startAlarm (){
-
-        if (App.ALARM){
+            Log.w(TAG, "MainFragment startAlarm");
             Intent intent = new Intent(getActivity(), AlarmButtonService.class);
-            getActivity().bindService(intent, serviceConnection, Context.BIND_ABOVE_CLIENT);
+            getActivity().startService(intent);
 
             Toast.makeText(getActivity(), R.string.MessageSentToast, Toast.LENGTH_LONG).show();
-        }
-
-
     }
 }

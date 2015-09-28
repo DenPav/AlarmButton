@@ -13,6 +13,7 @@ import java.util.Properties;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
+import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
@@ -23,10 +24,7 @@ import javax.mail.internet.MimeMessage;
 /**
  * AlarmButton created by Denis Pavlovsky on 07.05.15.
  */
-public class MailSender extends javax.mail.Authenticator {
-    private String mailhost = getSMTP();
-    private String user;
-    private String password;
+public class MailSender {
     private Session session;
     private Context mContext;
 
@@ -36,11 +34,10 @@ public class MailSender extends javax.mail.Authenticator {
 
     public MailSender(Context context, String user, String password) {
         mContext = context;
-        this.user = user;
-        this.password = password;
 
         Properties props = new Properties();
         props.setProperty("mail.transport.protocol", "smtp");
+        String mailhost = getSMTP();
         props.setProperty("mail.host", mailhost);
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.port", "465");
@@ -50,12 +47,9 @@ public class MailSender extends javax.mail.Authenticator {
         props.put("mail.smtp.socketFactory.fallback", "false");
         props.setProperty("mail.smtp.quitwait", "false");
 
-        session = Session.getDefaultInstance(props, this);
+        session = Session.getDefaultInstance(props, new GMailAuthenticator(user, password));
     }
 
-    protected PasswordAuthentication getPasswordAuthentication() {
-        return new PasswordAuthentication(user, password);
-    }
 
     public synchronized void sendMail(String subject, String body, String sender, String recipients) throws Exception {
         try{
@@ -76,7 +70,7 @@ public class MailSender extends javax.mail.Authenticator {
 
     public String getSMTP() {
         SharedPreferences sharedPref = mContext.getSharedPreferences(App.PREFERENCES_NAME, Context.MODE_PRIVATE);
-        String mail_dealer = sharedPref.getString(App.SMTP_NAME, App.DEFOULT_MAIL);
+        String mail_dealer = sharedPref.getString(App.SMTP_NAME, App.DEFOULT_SMTP);
         return "smtp." + mail_dealer;
     }
 
@@ -116,6 +110,22 @@ public class MailSender extends javax.mail.Authenticator {
 
         public OutputStream getOutputStream() throws IOException {
             throw new IOException("Not Supported");
+        }
+    }
+
+
+    class GMailAuthenticator extends Authenticator {
+        String user;
+        String pw;
+        public GMailAuthenticator (String username, String password)
+        {
+            super();
+            this.user = username;
+            this.pw = password;
+        }
+        public PasswordAuthentication getPasswordAuthentication()
+        {
+            return new PasswordAuthentication(user, pw);
         }
     }
 }

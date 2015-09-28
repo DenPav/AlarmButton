@@ -58,9 +58,10 @@ public class AlarmButtonService extends IntentService
 
     @Override
     public IBinder onBind(Intent intent) {
-        if (App.ALARM) {
-            alarm();
-        }
+//        if (App.ALARM) {
+//            Log.w(TAG, "onBind Method STARTS ");
+//            alarm();
+//        }
 
         return null;
     }
@@ -68,6 +69,7 @@ public class AlarmButtonService extends IntentService
     @Override
     protected void onHandleIntent(Intent intent) {
         if (App.ALARM) {
+            Log.w(TAG, "onHandleIntent Method STARTS ");
             alarm();
         }
     }
@@ -108,7 +110,7 @@ public class AlarmButtonService extends IntentService
 
             pendingIntent = PendingIntent.getService(getApplicationContext(), App.ALARM_REQUEST_CODE, newIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-            manager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, App.ALARM_INTERVAL * 60 * 1000, App.ALARM_INTERVAL, pendingIntent);
+            manager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, App.ALARM_INTERVAL * 60000, App.ALARM_INTERVAL * 60000, pendingIntent);
 
         } else if (!App.ALARM) {
             manager.cancel(pendingIntent);
